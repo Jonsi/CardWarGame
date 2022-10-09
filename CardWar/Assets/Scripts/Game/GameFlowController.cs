@@ -21,9 +21,8 @@ public class GameFlowController : MonoBehaviour
         {
             while (_playerManager.AlivePlayers().Count > 1)
             {
-
                 var round = new Round(_playerManager);
-                round.Draw(fliped: false); // all draws a card. each player should have two decks.
+                round.Draw(fliped: false); // all draws a card. each player should have two decks.dw
                 await UniTask.Delay(1000);
                 var winner = round.CheckForWinner();
                 if (winner != null)

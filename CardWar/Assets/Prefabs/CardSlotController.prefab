@@ -211,7 +211,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5155554136884464219}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f5477742a705784f8adc72c61568218, type: 3}
+  m_Script: {fileID: 11500000, guid: e97dea50110a2e7489cf830225b29436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   View: {fileID: 5155554138461438803}
@@ -339,7 +339,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5155554138461438800}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be688581b2c8906458ddb7fb750aa549, type: 3}
+  m_Script: {fileID: 11500000, guid: 06f070aa95ea7e743918404e367849ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _cardSuitSprites: {fileID: 11400000, guid: 5799fdd07c44d184a9dce72f05d42a30, type: 2}

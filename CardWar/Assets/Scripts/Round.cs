@@ -13,7 +13,7 @@ public class Round{
     {
         foreach(var player in _alivePlayers)
         {
-            var card = player.DrawCard(fliped);
+            var card = player.PlaceCard(fliped);
             if(card == null)
             {
                 continue;

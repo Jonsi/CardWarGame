@@ -1,41 +1,54 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Zenject;
+using UnityEngine;
+
 public class Player : IPlayer
 {
-    private Deck _deck;
-    private Deck _placedDeck;
+    private CardDeck _placedCards;
     
     [Inject]
     private ICardSlotController _slotController;
 
     [Inject]
+    private ICardDeckController _deckController;
+
+    [Inject]
     private WorldEvent _worldEvent;
+
+    [Inject(Id = "deck_view")]
+    private ICardView _deckView;
+
+    [Inject(Id = "slot_view")]
+    private ICardView _slotView;
+
+    [Inject]
+    private ICardAnimator _cardAnimator;
 
     public Player()
     {
-        _deck = new Deck();
-        _placedDeck = new Deck();
+        _placedCards = new CardDeck();
     }
 
     public void AddCard(Card card)
     {
-        _deck.AddCard(card);
+        _deckController.AddCard(card);
     }
 
-    public Card DrawCard(bool flipped)
+    public Card PlaceCard(bool flipped)
     {
-        var deckItem = _deck.DrawItem();
-        if(deckItem == null)
+        var card = _deckController.DrawCard();
+        if(card == null)
         {
             _worldEvent.OnPlayerDied(this);
             return null;
         }
-
-        _placedDeck.AddCard(deckItem.Card,flipped);
-        SyncVisual();
-        return deckItem.Card;
+        _cardAnimator.MoveCard(card,_deckView, _slotView);
+        _placedCards.AddCard(card,flipped);
+        _slotController.Set(card);
+        return card;
 
     }
 
@@ -44,20 +57,13 @@ public class Player : IPlayer
         var placedCards = new List<Card>();
         while (true)
         {
-            var item = _placedDeck.DrawItem();
-            if (item == null)
+            var card = _placedCards.DrawItem();
+            if (card == null)
             {
-                SyncVisual();
                 return placedCards;
             }
-            placedCards.Add(item.Card);
+            placedCards.Add(card);
+            
         }
     }
-
-    private void SyncVisual()
-    {
-        var deckItem = _placedDeck.Peek(includeFlips: true);
-        _slotController.Set(deckItem);
-    }
-
 }
