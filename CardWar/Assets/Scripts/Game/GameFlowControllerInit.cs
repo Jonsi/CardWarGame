@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
+using Zenject;
 
 public static class GameFlowControllerInit
 {
-
     public static void InitGame(IPlayerManager playerManager)
     {
 
@@ -19,18 +19,18 @@ public static class GameFlowControllerInit
 
     }
 
-    private static List<Card> CreateSortedCards()
+    private static List<PlacedCard> CreateSortedCards()
     {
         CardSuit[] suits = (CardSuit[])Enum.GetValues(typeof(CardSuit));
         CardKind[] kinds = (CardKind[])Enum.GetValues(typeof(CardKind));
 
-        List<Card> cards = new List<Card>();
+        List<PlacedCard> cards = new List<PlacedCard>();
 
         foreach (CardSuit suit in suits)
         {
             foreach (CardKind kind in kinds)
             {
-                cards.Add(new Card(kind, suit));
+                cards.Add(new PlacedCard(kind, suit,facingUp : false));
             }
         }
 

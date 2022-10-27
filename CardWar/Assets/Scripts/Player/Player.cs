@@ -4,66 +4,66 @@ using System.Collections.Generic;
 using System.Numerics;
 using Zenject;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class Player : IPlayer
-{
+{       
     private CardDeck _placedCards;
-    
-    [Inject]
-    private ICardSlotController _slotController;
 
     [Inject]
-    private ICardDeckController _deckController;
-
-    [Inject]
-    private WorldEvent _worldEvent;
-
-    [Inject(Id = "deck_view")]
-    private ICardView _deckView;
-
-    [Inject(Id = "slot_view")]
-    private ICardView _slotView;
+    private TableSlot _tableSlot;
 
     [Inject]
     private ICardAnimator _cardAnimator;
+
+    [Inject]
+    private WorldEvent _worldEvent;
 
     public Player()
     {
         _placedCards = new CardDeck();
     }
 
-    public void AddCard(Card card)
+    public void AddCard(PlacedCard card)
     {
-        _deckController.AddCard(card);
+        _tableSlot.DeckController.AddCard(card);
     }
 
-    public Card PlaceCard(bool flipped)
+    public async UniTask<PlacedCard> PlaceCard(bool facingUp)
     {
-        var card = _deckController.DrawCard();
-        if(card == null)
+        var card = _tableSlot.DeckController.DrawCard();
+        if (card == null)
         {
             _worldEvent.OnPlayerDied(this);
             return null;
         }
-        _cardAnimator.MoveCard(card,_deckView, _slotView);
-        _placedCards.AddCard(card,flipped);
-        _slotController.Set(card);
-        return card;
 
+        card.Flip(facingUp);
+
+        var animationComplete = new UniTaskCompletionSource();
+        _cardAnimator.MoveCard(card, _tableSlot.DeckView, _tableSlot.SlotView, onComplete: () => { animationComplete.TrySetResult(); });
+        await animationComplete.Task;
+        _tableSlot.SlotController.Set(card);
+        
+        _placedCards.AddCard(card);
+        return card;
     }
 
-    public List<Card> TakePlacedCards()
+    public List<PlacedCard> TakePlacedCards()
     {
-        var placedCards = new List<Card>();
+        var placedCards = new List<PlacedCard>();
+
         while (true)
         {
             var card = _placedCards.DrawItem();
             if (card == null)
             {
-                return placedCards;
+                break;
             }
             placedCards.Add(card);
-            
         }
+
+        _tableSlot.SlotController.Set(null);
+        return placedCards;
     }
 }

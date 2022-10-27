@@ -14,7 +14,6 @@ public class PlayerManager : IPlayerManager
     {
         _players = players;
         _alivePlayers = players;
-
     }
     
     [Inject]

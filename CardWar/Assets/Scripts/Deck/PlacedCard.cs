@@ -1,9 +1,12 @@
 ﻿public class PlacedCard : Card
 {
-    public readonly bool IsFlipped;
+    public bool isFacingUp { get; private set; }
 
-    public PlacedCard(Card card,bool isFlipped) : base(card.Kind,card.Suit)
+    public PlacedCard(CardKind kind,CardSuit suit, bool facingUp) : base(kind, suit)
     {
-        IsFlipped = isFlipped;
+        isFacingUp = facingUp;
     }
+
+    public void Flip(bool facingUp) => isFacingUp = facingUp;
+
 }

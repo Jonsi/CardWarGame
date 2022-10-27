@@ -7,9 +7,9 @@ public class CardDeck
     private List<PlacedCard> _items = new List<PlacedCard>();
     public int Count { get { return _items.Count; } }
 
-    public void AddCard(Card card, bool isFlipped = false)
+    public void AddCard(PlacedCard card)
     {
-        _items.Add(new PlacedCard(card, isFlipped));
+        _items.Add(card);
     }
 
     public PlacedCard DrawItem()
@@ -30,7 +30,7 @@ public class CardDeck
             {
                 return true;
             }
-            return !item.IsFlipped;
+            return !item.isFacingUp;
         });
     }
 }

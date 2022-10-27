@@ -1,5 +1,5 @@
 ﻿public interface ICardDeckController : IController<CardDeck>
 {
-    void AddCard(Card card);
+    void AddCard(PlacedCard card);
     PlacedCard DrawCard();
 }

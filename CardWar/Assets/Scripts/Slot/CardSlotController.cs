@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 
 public class CardSlotController : MVCController<SlotView, PlacedCard>, ICardSlotController
 {
-    public Card TakeCard()
+    public PlacedCard TakeCard()
     {
+        var data = Data;
+        Set(null);
         return Data;
     }
+
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 
+//TODO: MAKE CARD VIEW AND MAKE DECK VIEW INHERIT FRO IT
 public class SlotView : MVCView<PlacedCard>,ICardView
 {
     [SerializeField] private CardSprites _cardSuitSprites;
@@ -15,19 +16,20 @@ public class SlotView : MVCView<PlacedCard>,ICardView
 
         if (card == null)
         {
-            SetBlank();
+            ShowBlank();
             return;
         }
 
-        if (card.IsFlipped)
+        if (card.isFacingUp == false)
         {
-            SetFlipped();
+            ShowFlipped();
             return;
         }
-        SetView(card);
+
+        ShowCard(card);
     }
 
-    private void SetView(PlacedCard card)
+    private void ShowCard(PlacedCard card)
     {
         _spriteRenderer.sprite = _cardSuitSprites.GetSuitSprite(card.Suit);
 
@@ -41,13 +43,13 @@ public class SlotView : MVCView<PlacedCard>,ICardView
         }
     }
 
-    private void SetFlipped()
+    private void ShowFlipped()
     {
         _spriteRenderer.sprite = _cardSuitSprites.BackSide;
         _kindText.text = "";
     }
 
-    private void SetBlank()
+    private void ShowBlank()
     {
         _spriteRenderer.sprite = _cardSuitSprites.Blank;
         _kindText.text = "";

@@ -1,25 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using System.Linq;
 
 public class Round{
-    private List<IPlayer> _alivePlayers;
+    private List<IPlayer> _roundPlayers;
     private Dictionary<Card, IPlayer> _cardToPlayer = new Dictionary<Card, IPlayer>();
 
     public Round(IPlayerManager playerManager)
     {
-        _alivePlayers = playerManager.AlivePlayers().OrderBy(item => UnityEngine.Random.value).ToList();
+        _roundPlayers = playerManager.AlivePlayers().OrderBy(item => UnityEngine.Random.value).ToList();
     }
-    public void Draw(bool fliped)
+     public async UniTask Draw(bool facingUp)
     {
-        foreach(var player in _alivePlayers)
+        var tasks = new List<UniTask<PlacedCard>>();
+
+        foreach(var player in _roundPlayers)
         {
-            var card = player.PlaceCard(fliped);
+            var task = player.PlaceCard(facingUp);
+            tasks.Add(task);
+        }
+
+        var placedCards = await UniTask.WhenAll(tasks);
+
+        for (int i = 0; i < _roundPlayers.Count; i++)
+        {
+            var card = placedCards[i];
+
             if(card == null)
             {
                 continue;
             }
-            _cardToPlayer.Add(card, player);
+
+            _cardToPlayer.Add(card, _roundPlayers[i]);
         }
+
     }
 
     public IPlayer CheckForWinner()

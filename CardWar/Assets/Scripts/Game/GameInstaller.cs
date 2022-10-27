@@ -4,44 +4,40 @@ using System.Collections.Generic;
 using UnityEditor;
 using Zenject.SpaceFighter;
 using static UnityEditor.Experimental.GraphView.GraphView;
+using System.Linq;
 
 public class GameInstaller : MonoInstaller
 {
-    public CardSlotController CardSlotController;
-    public DeckController DeckController;
-    public SlotView SlotView;
-    public DeckView DeckView;
+    [SerializeField] private int _numPlayers = 2;
+    [SerializeField] private Table _table;
+    [SerializeField] private CardAnimator _cardAnimator;
+    [SerializeField] private DeckView _cardsStackView;
+    [SerializeField] private DeckController _cardStack;
 
     public override void InstallBindings()
     {
-        IPlayer player1 = new Player();
-        IPlayer player2 = new Player();
+        var playerToTableSlot = new Dictionary<IPlayer, TableSlot>();
+        var players = new List<IPlayer>();
 
-        Container.QueueForInject(player1);
-        Container.QueueForInject(player2);
-
-        PlayerManager playerManager = new PlayerManager(new List<IPlayer>() { player1, player2 });
+        for(int i = 0; i < _numPlayers; i++)
+        {
+            var player = new Player();
+            Container.QueueForInject(player);
+            var tableSlot = _table.GetSlot(i);
+            Container.Bind<TableSlot>().FromInstance(tableSlot).WhenInjectedIntoInstance(player);
+            playerToTableSlot.Add(player, tableSlot);
+            players.Add(player);
+        }
+        Container.QueueForInject(_cardAnimator);
+        Container.Bind<ICardAnimator>().FromInstance(_cardAnimator);
+        Container.Bind<ICardView>().WithId("cards_stack").FromInstance(_cardsStackView);
+        Container.Bind<ICardDeckController>().FromInstance(_cardStack).WhenInjectedInto<GameFlowController>();
+        PlayerManager playerManager = new PlayerManager(players);
         Container.Bind<IPlayerManager>().FromInstance(playerManager);
+        Container.Bind<Dictionary<IPlayer, TableSlot>>().FromInstance(playerToTableSlot);
         Container.QueueForInject(playerManager);
 
-        Container.Bind<ITable>().To<Table>().AsSingle();
         Container.Bind<WorldEvent>().FromInstance(new WorldEvent()).AsSingle();
 
-    }
-
-    private void InstallPlayer(IPlayer player,ICardSlotController cardSlotController,ICardView deckView,ICardView slotView)
-    {
-        Container.Bind<ICardSlotController>().FromInstance(cardSlotController).WhenInjectedIntoInstance(player);
-        Container.Bind<ICardView>().WithId("slot_view").FromInstance(slotView).WhenInjectedIntoInstance(player);
-        Container.Bind<ICardView>().WithId("deck_view").FromInstance(deckView).WhenInjectedIntoInstance(player);
-    }
-
-    private void InstallPlayer(IPlayer player)
-    {
-        Container.Bind<ICardSlotController>().FromInstance(CardSlotController).WhenInjectedIntoInstance(player);
-        Container.Bind<ICardDeckController>().FromInstance(DeckController).WhenInjectedIntoInstance(player);
-        Container.Bind<ICardView>().WithId("slot_view").FromInstance(SlotView).WhenInjectedIntoInstance(player);
-        Container.Bind<ICardView>().WithId("deck_view").FromInstance(DeckView).WhenInjectedIntoInstance(player);
-        Container.QueueForInject(player);
     }
 }

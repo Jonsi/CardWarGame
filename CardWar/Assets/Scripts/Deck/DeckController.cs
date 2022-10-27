@@ -16,9 +16,9 @@ public class DeckController : MVCController<DeckView, CardDeck>, ICardDeckContro
         return item;
     }
 
-    public void AddCard(Card card)
+    public void AddCard(PlacedCard card)
     {
-        Data.AddCard(card,isFlipped : true);
+        Data.AddCard(card);
         Set(Data);
     }
 }
